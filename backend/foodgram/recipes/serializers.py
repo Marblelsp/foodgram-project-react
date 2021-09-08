@@ -218,5 +218,5 @@ class FavoriteSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         request = self.context.get('request')
         user = request.user
-        recipe = validated_data['recipe']['id'] 
+        recipe = validated_data['recipe']['id']
         return Favorite.objects.create(user=user, recipe_id=recipe)
