@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import (Favorite, Follow, Ingredient, IngredientRecipe, Recipe,
+from .models import (Favorite, Ingredient, IngredientRecipe, Recipe,
                      ShopingCart, Tag)
 
 
@@ -44,10 +44,4 @@ class FavoriteAdmin(admin.ModelAdmin):
 @admin.register(ShopingCart)
 class ShopingCartAdmin(admin.ModelAdmin):
     list_display = ('user', 'recipe', )
-    empty_value_display = '-пусто-'
-
-
-@admin.register(Follow)
-class FollowAdmin(admin.ModelAdmin):
-    list_display = ('user', 'following', )
     empty_value_display = '-пусто-'

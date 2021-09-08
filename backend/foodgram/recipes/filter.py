@@ -27,7 +27,10 @@ class RecipesFilter(django_filters.FilterSet):
         user = self.request.user
         user_recipes = user.favorites.all()
         user_recipes_id = [i.recipe.id for i in user_recipes]
-        return queryset.filter(id__in = user_recipes_id, **{lookup: not(value)})
+        return queryset.filter(
+            id__in=user_recipes_id,
+            **{lookup: not(value)}
+        )
 
     is_in_shopping_cart = django_filters.BooleanFilter(
         field_name='wishlist_recipe__recipe',
@@ -40,9 +43,17 @@ class RecipesFilter(django_filters.FilterSet):
         user = self.request.user
         user_recipes = user.shop_carts.all()
         user_recipes_id = [i.recipe.id for i in user_recipes]
-        return queryset.filter(id__in = user_recipes_id, **{lookup: not(value)})
-
+        return queryset.filter(
+            id__in=user_recipes_id,
+            **{lookup: not(value)}
+        )
 
     class Meta:
         model = Recipe
-        fields = ['is_favorited', 'tags', 'is_in_shopping_cart', 'author', 'name']
+        fields = (
+            'is_favorited',
+            'tags',
+            'is_in_shopping_cart',
+            'author',
+            'name'
+        )

@@ -1,9 +1,7 @@
+from django.contrib.auth import get_user_model
 from django.core.validators import MinValueValidator
 from django.db import models
 from pytils.translit import slugify
-from django.contrib.auth import get_user_model
-
-from users.models import CustomUser
 
 User = get_user_model()
 
@@ -69,26 +67,6 @@ class Recipe(models.Model):
         return self.name
 
 
-class Follow(models.Model):
-    user = models.ForeignKey(
-        User,
-        on_delete=models.CASCADE,
-        related_name="follower"
-    )
-    following = models.ForeignKey(
-        User,
-        on_delete=models.CASCADE,
-        related_name="following"
-    )
-
-    class Meta:
-        constraints = [
-            models.UniqueConstraint(
-                fields=["user", "following"],
-                name="unique_author_user_following")
-        ]
-
-
 class IngredientRecipe(models.Model):
     ingredient = models.ForeignKey(
         Ingredient,
@@ -118,6 +96,7 @@ class Favorite(models.Model):
         on_delete=models.CASCADE,
         related_name="favorites"
     )
+
     class Meta:
         constraints = [
             models.UniqueConstraint(
@@ -137,6 +116,7 @@ class ShopingCart(models.Model):
         on_delete=models.CASCADE,
         related_name="shop_carts"
     )
+
     class Meta:
         constraints = [
             models.UniqueConstraint(

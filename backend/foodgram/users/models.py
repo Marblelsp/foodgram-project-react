@@ -2,20 +2,17 @@ from django.contrib.auth.models import AbstractUser
 from django.db import models
 
 
-class Type:
-    USER = 'USER'
-    ADMIN = 'ADMIN'
-    ROLE = (
-        ("USER", "USER"),
-        ("ADMIN", "ADMIN"),
-    )
+class CustomUserRole(models.TextChoices):
+    admin = 'admin', 'admin'
+    user = 'user', 'user'
+    moderator = 'moderator', 'moderator'
 
 
 class CustomUser(AbstractUser):
     role = models.CharField(
         max_length=20,
-        choices=Type.ROLE,
-        default=Type.USER,
+        choices=CustomUserRole.choices,
+        default=CustomUserRole.user,
     )
     email = models.EmailField(
         max_length=254, unique=True,
@@ -35,4 +32,24 @@ class CustomUser(AbstractUser):
 
     @property
     def is_admin(self):
-        return self.role == Type.ADMIN or self.is_superuser
+        return self.role == CustomUserRole.admin or self.is_superuser
+
+
+class Follow(models.Model):
+    user = models.ForeignKey(
+        CustomUser,
+        on_delete=models.CASCADE,
+        related_name="follower"
+    )
+    following = models.ForeignKey(
+        CustomUser,
+        on_delete=models.CASCADE,
+        related_name="following"
+    )
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=["user", "following"],
+                name="unique_author_user_following")
+        ]
