@@ -2,8 +2,8 @@ from django.contrib.auth import get_user_model
 from django.db import transaction
 from drf_extra_fields.fields import Base64ImageField
 from rest_framework import serializers
-
 from users.serializers import CustomUserSerializer
+
 from .models import (Favorite, Ingredient, IngredientRecipe, Recipe,
                      ShopingCart, Tag)
 
@@ -70,7 +70,7 @@ class CreateRecipeSerializer(serializers.ModelSerializer):
         return instance
 
     @transaction.atomic
-    def create(self,  validated_data):
+    def create(self, validated_data):
         context = self.context['request']
         author = context.user
         tags = validated_data.pop("tags")

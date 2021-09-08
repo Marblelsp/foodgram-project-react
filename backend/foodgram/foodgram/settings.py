@@ -114,8 +114,8 @@ USE_TZ = True
 DJOSER = {
     'HIDE_USERS': False,
     'PERMISSIONS': {
-            'user_list': ['rest_framework.permissions.AllowAny'],
-            'user': ['rest_framework.permissions.AllowAny'],
+        'user_list': ['rest_framework.permissions.AllowAny'],
+        'user': ['rest_framework.permissions.AllowAny'],
     },
     'SERIALIZERS': {
         'current_user': 'recipes.serializers.CustomUserSerializer',
