@@ -179,8 +179,7 @@ class ShoppingCartSerializer(serializers.ModelSerializer):
         request = self.context.get('request')
         user = request.user
         recipe = validated_data['recipe']['id']
-        recipes_cart = ShopingCart.objects.create(user=user, recipe_id=recipe)
-        return recipes_cart
+        return ShopingCart.objects.create(user=user, recipe_id=recipe)
 
 
 class FavoriteSerializer(serializers.ModelSerializer):
@@ -219,6 +218,5 @@ class FavoriteSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         request = self.context.get('request')
         user = request.user
-        recipe = validated_data['recipe']['id']
-        recipes_cart = Favorite.objects.create(user=user, recipe_id=recipe)
-        return recipes_cart
+        recipe = validated_data['recipe']['id'] 
+        return Favorite.objects.create(user=user, recipe_id=recipe)

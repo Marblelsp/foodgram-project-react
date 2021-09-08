@@ -77,8 +77,7 @@ class FollowSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         following = validated_data.get('following')
         user = self.context['request'].user
-        recipes_cart = Follow.objects.create(user=user, following=following)
-        return recipes_cart
+        return Follow.objects.create(user=user, following=following)
 
     def get_is_subscribed(self, obj):
         request = self.context.get('request')
