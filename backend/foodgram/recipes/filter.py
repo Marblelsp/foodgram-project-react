@@ -33,7 +33,7 @@ class RecipesFilter(django_filters.FilterSet):
         )
 
     is_in_shopping_cart = django_filters.BooleanFilter(
-        field_name='wishlist_recipe__recipe',
+        field_name='shop_carts__recipe',
         method='filter_is_in_shopping_cart',
         lookup_expr='isnull'
     )
@@ -55,5 +55,5 @@ class RecipesFilter(django_filters.FilterSet):
             'tags',
             'is_in_shopping_cart',
             'author',
-            'name'
+            'ingredients'
         )
