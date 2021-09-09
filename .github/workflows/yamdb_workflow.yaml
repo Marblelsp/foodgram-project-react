@@ -23,7 +23,6 @@ jobs:
     - name: Test with flake8 and django tests
       run: |
         cd backend/foodgram/
-        python isort .
         python -m flake8
 
 
