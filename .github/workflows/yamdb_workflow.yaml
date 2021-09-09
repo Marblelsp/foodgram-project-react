@@ -30,7 +30,8 @@ jobs:
       name: Push Docker image to Docker Hub
       runs-on: ubuntu-latest
       needs: tests
-      run: cd backend/foodgram/
+      run: |
+        cd backend/foodgram/
       if: github.ref == 'refs/heads/master'
       steps:
         - name: Check out the repo
