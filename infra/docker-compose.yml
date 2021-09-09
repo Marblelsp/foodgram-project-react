@@ -23,7 +23,7 @@ services:
       - media_value:/code/dj_media/
     env_file:
       - ./.env
-
+ 
   frontend:
     image: marblelsp/foodgram_front
     build:
