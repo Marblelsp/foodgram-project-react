@@ -1,9 +1,11 @@
 from django.contrib.auth import get_user_model
 from rest_framework import serializers
-from drf_extra_fields.fields import Base64ImageField
 
 from recipes.models import Recipe
+
 from .models import Follow
+
+from drf_extra_fields.fields import Base64ImageField
 
 User = get_user_model()
 
