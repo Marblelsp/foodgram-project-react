@@ -11,9 +11,7 @@ services:
       - ./.env
 
   backend:
-    build:
-      context: ../backend/foodgram
-      dockerfile: Dockerfile
+    image: marblelsp/foodgram_backend
     restart: always
     depends_on:
       - db
@@ -24,9 +22,7 @@ services:
       - ./.env
  
   frontend:
-    build:
-      context: ../frontend
-      dockerfile: Dockerfile
+    image: marblelsp/foodgram_frontend
     volumes:
       - ../frontend/:/app/result_build/
     depends_on:
