@@ -4,7 +4,7 @@ import environ
 
 environ.Env.read_env()
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY')
+SECRET_KEY = 'j4ky1p!nmmearfw!w%&i-qa$+nqi$x-y0990-93g4^wj5v3'
 DEBUG = False
 ALLOWED_HOSTS = ['*']
 INSTALLED_APPS = [
