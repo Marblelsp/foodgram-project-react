@@ -1,6 +1,6 @@
 name: Django-app workflow
 
-#on: [push]
+[push]
 
 jobs:
   tests:
