@@ -1,4 +1,4 @@
-![example workflow](https://github.com/marblelsp/foodgram-project-react/actions/workflows/foodgram_workflow.yaml/badge.svg)
+![example workflow](https://github.com/Marblelsp/foodgram-project-react/actions/workflows/yamdb_workflow.yaml/badge.svg)
 # Foodgram
 
 «Продуктовый помощник» (Проект Яндекс.Практикум)
