@@ -37,4 +37,6 @@ docker-compose exec backend python manage.py migrate
 docker-compose exec backend python manage.py loaddata ingredients.json
 docker-compose exec backend python manage.py loaddata tags.json
 ```
-После выполнения данных шагов сервис готов к работе
+После выполнения данных шагов сервис готов к работе по адресу: http://127.0.0.1/signin
+
+Работу готового сервиса можете протестировать по адресу http://foodgramex.co.vu/
