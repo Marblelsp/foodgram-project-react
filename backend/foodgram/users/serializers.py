@@ -1,8 +1,9 @@
 from django.contrib.auth import get_user_model
 from drf_extra_fields.fields import Base64ImageField
-from recipes.models import Recipe
 from rest_framework import serializers
+from rest_framework.validators import UniqueTogetherValidator
 
+from recipes.models import Recipe
 from .models import Follow
 
 User = get_user_model()
@@ -60,15 +61,17 @@ class FollowSerializer(serializers.ModelSerializer):
             'user',
             'following'
         )
+        validators = [
+            UniqueTogetherValidator(
+                queryset=Follow.objects.all(),
+                fields=['user', 'following']
+            )
+        ]
 
     def validate(self, data):
         following = data.get('following')
         user = self.context['request'].user
-        if Follow.objects.filter(user=user, following=following).exists():
-            raise serializers.ValidationError({
-                'errors': 'Вы уже подписались на данного пользователя'
-            })
-        elif user == following:
+        if user == following:
             raise serializers.ValidationError({
                 'errors': 'Нельзя подписаться на самого себя'
             })

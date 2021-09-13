@@ -4,8 +4,8 @@ import environ
 
 environ.Env.read_env()
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-SECRET_KEY = 'j4ky1p!nmmearfw!w%&i-qa$+nqi$x-y0990-93g4^wj5v3'
-DEBUG = False
+SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY')
+DEBUG = True
 ALLOWED_HOSTS = ['*']
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -59,7 +59,7 @@ DATABASES = {
         'NAME': os.environ.get('POSTGRES_DB'),
         'USER': os.environ.get('POSTGRES_USER'),
         'PASSWORD': os.environ.get('POSTGRES_PASSWORD'),
-        'HOST': os.environ.get('DB_HOST'),
+        'HOST': "127.0.0.1",
         'PORT': os.environ.get('DB_PORT'),
     }
 }

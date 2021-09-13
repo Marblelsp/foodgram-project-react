@@ -32,7 +32,7 @@ class Recipe(models.Model):
     ingredients = models.ManyToManyField(
         Ingredient,
         through='IngredientRecipe',
-        related_name='resipe_set'
+        related_name='recipes'
     )
     tags = models.ManyToManyField(Tag, blank=True)
     image = models.ImageField(
@@ -71,12 +71,12 @@ class IngredientRecipe(models.Model):
     ingredient = models.ForeignKey(
         Ingredient,
         on_delete=models.CASCADE,
-        related_name="ingredient_recipe"
+        related_name="recipe_ingredients"
     )
     recipe = models.ForeignKey(
         Recipe,
         on_delete=models.CASCADE,
-        related_name="ingredient_recipe"
+        related_name="recipe_ingredients"
     )
     amount = models.PositiveSmallIntegerField(
         default=1,

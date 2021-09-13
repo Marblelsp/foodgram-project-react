@@ -1,3 +1,4 @@
+from collections import defaultdict
 from datetime import datetime
 
 from django.contrib.auth import get_user_model
@@ -23,7 +24,7 @@ User = get_user_model()
 class RecipeViewSet(viewsets.ModelViewSet):
     queryset = Recipe.objects.all()
     serializer_class = CreateRecipeSerializer
-    permission_classes = [IsAuthorOrReadOnly]
+    permission_classes = (IsAuthorOrReadOnly, )
     filter_backends = (DjangoFilterBackend, )
     filterset_class = RecipesFilter
 
@@ -50,7 +51,7 @@ class TagViewSet(mixins.ListModelMixin,
 
 
 class ShopingCartView(APIView):
-    permission_classes = (IsAuthenticated,)
+    permission_classes = (IsAuthenticated, )
 
     def get(self, request, recipe_id):
         data = {'id': recipe_id}
@@ -59,7 +60,11 @@ class ShopingCartView(APIView):
             context={'request': request},
             partial=True
         )
-        serializer.is_valid(raise_exception=True)
+        if not serializer.is_valid():
+            return Response(
+                serializer.errors,
+                status=status.HTTP_400_BAD_REQUEST
+            )
         serializer.save()
         return Response(
             serializer.data,
@@ -67,7 +72,7 @@ class ShopingCartView(APIView):
         )
 
     def delete(self, request, recipe_id):
-        user = request.user.id
+        user = request.user
         cart = get_object_or_404(
             ShopingCart,
             user=user,
@@ -81,7 +86,7 @@ class ShopingCartView(APIView):
 
 
 class FavoriteView(APIView):
-    permission_classes = (IsAuthenticated,)
+    permission_classes = (IsAuthenticated, )
 
     def get(self, request, recipe_id):
         data = {'id': recipe_id}
@@ -90,7 +95,11 @@ class FavoriteView(APIView):
             context={'request': request},
             partial=True
         )
-        serializer.is_valid(raise_exception=True)
+        if not serializer.is_valid():
+            return Response(
+                serializer.errors,
+                status=status.HTTP_400_BAD_REQUEST
+            )
         serializer.save()
         return Response(
             serializer.data,
@@ -98,7 +107,7 @@ class FavoriteView(APIView):
         )
 
     def delete(self, request, recipe_id):
-        user = request.user.id
+        user = request.user
         cart = get_object_or_404(
             Favorite,
             user=user,
@@ -120,16 +129,15 @@ class DownloadShoppingCart(APIView):
             user_id=user.id).values_list("recipe", flat=True)
         ingredient_filter = IngredientRecipe.objects.filter(
             recipe_id__in=recipes_id).order_by('ingredient')
-        ingredients = {}
+
+        ingredients = defaultdict(int)
         for ingredient in ingredient_filter:
-            if ingredient.ingredient in ingredients.keys():
-                ingredients[ingredient.ingredient] += ingredient.amount
-            else:
-                ingredients[ingredient.ingredient] = ingredient.amount
+            ingredients[ingredient.ingredient] += ingredient.amount
         current_date = datetime.now().date()
         wishlist = [f"Список покупок на {current_date} \n", "\n"]
-        for k, v in ingredients.items():
-            wishlist.append(f'{k.name} - {v} {k.measurement_unit} \n')
+        for ingredient, quantity in ingredients.items():
+            wishlist.append(f'{ingredient.name} - {quantity}'
+                            f'{ingredient.measurement_unit} \n')
         wishlist.append('\n\n')
 
         wishlist.append(f'foodgram {current_date.year}')

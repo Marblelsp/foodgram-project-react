@@ -19,34 +19,11 @@ class RecipesFilter(django_filters.FilterSet):
     is_favorited = django_filters.BooleanFilter(
         field_name='favorites__recipe',
         method='filter_is_favorited',
-        lookup_expr='isnull'
     )
-
-    def filter_is_favorited(self, queryset, name, value):
-        lookup = '__'.join([name, 'isnull'])
-        user = self.request.user
-        user_recipes = user.favorites.all()
-        user_recipes_id = [i.recipe.id for i in user_recipes]
-        return queryset.filter(
-            id__in=user_recipes_id,
-            **{lookup: not(value)}
-        )
-
     is_in_shopping_cart = django_filters.BooleanFilter(
         field_name='shop_carts__recipe',
         method='filter_is_in_shopping_cart',
-        lookup_expr='isnull'
     )
-
-    def filter_is_in_shopping_cart(self, queryset, name, value):
-        lookup = '__'.join([name, 'isnull'])
-        user = self.request.user
-        user_recipes = user.shop_carts.all()
-        user_recipes_id = [i.recipe.id for i in user_recipes]
-        return queryset.filter(
-            id__in=user_recipes_id,
-            **{lookup: not(value)}
-        )
 
     class Meta:
         model = Recipe
@@ -56,4 +33,18 @@ class RecipesFilter(django_filters.FilterSet):
             'is_in_shopping_cart',
             'author',
             'ingredients'
+        )
+
+    def filter_is_favorited(self, queryset, name, value):
+        user = self.request.user
+        return queryset.filter(
+            recipes__user=user,
+            **{name: value}
+        )
+
+    def filter_is_in_shopping_cart(self, queryset, name, value):
+        user = self.request.user
+        return queryset.filter(
+            shop_carts__user=user,
+            **{name: value}
         )

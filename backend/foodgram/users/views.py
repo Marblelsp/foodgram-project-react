@@ -19,7 +19,7 @@ class FollowView(APIView):
 
     def get(self, request, user_id):
         following = get_object_or_404(User, id=user_id)
-        data = {'id': request.user.id, 'following': user_id}
+        data = {'user': request.user.id, 'following': user_id}
         serializer = FollowSerializer(
             data=data,
             context={'request': request},
@@ -52,7 +52,7 @@ class FollowView(APIView):
 @permission_classes([IsAuthenticated, ])
 def my_subscriptions(request):
     user = request.user
-    following = user.follower.all()
+    following = user.followers.all()
     user_obj = []
     for follow_obj in following:
         user_obj.append(follow_obj.following)
