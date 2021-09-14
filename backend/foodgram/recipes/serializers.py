@@ -47,20 +47,8 @@ class CreateRecipeSerializer(serializers.ModelSerializer):
         )
         model = Recipe
 
-    @transaction.atomic
-    def update(self, instance, validated_data):
-        context = self.context['request']
-        tags = validated_data.pop("tags")
-        ingredients = validated_data.pop('recipe_ingredients')
-
-        instance.author = context.user
-        for item in validated_data:
-            if Recipe._meta.get_field(item):
-                setattr(instance, item, validated_data[item])
-        instance.tags.set(tags)
-        instance.recipe_ingredients.all().delete()
-
-        new_recipe_ingredients = []
+    def create_ingredients_recipe(self, ingredients,
+                                  new_recipe_ingredients, instance):
         for ingredient in ingredients:
             new_recipe_ingredients.append(
                 IngredientRecipe(
@@ -70,6 +58,26 @@ class CreateRecipeSerializer(serializers.ModelSerializer):
                 )
             )
         IngredientRecipe.objects.bulk_create(new_recipe_ingredients)
+
+    @transaction.atomic
+    def update(self, instance, validated_data):
+        context = self.context['request']
+        tags = validated_data.pop("tags")
+        ingredients = validated_data.pop('recipe_ingredients')
+        instance.author = context.user
+
+        for item in validated_data:
+            if Recipe._meta.get_field(item):
+                setattr(instance, item, validated_data[item])
+        instance.tags.set(tags)
+        instance.recipe_ingredients.all().delete()
+
+        new_recipe_ingredients = []
+        self.create_ingredients_recipe(
+            ingredients,
+            new_recipe_ingredients,
+            instance
+        )
         instance.save()
         return instance
 
@@ -81,16 +89,13 @@ class CreateRecipeSerializer(serializers.ModelSerializer):
         ingredients = validated_data.pop("recipe_ingredients")
         recipe = Recipe.objects.create(**validated_data, author=author)
         recipe.tags.set(tags)
+
         new_recipe_ingredients = []
-        for ingredient in ingredients:
-            new_recipe_ingredients.append(
-                IngredientRecipe(
-                    recipe=recipe,
-                    ingredient_id=ingredient['ingredient']['id'],
-                    amount=ingredient['amount'],
-                )
-            )
-        IngredientRecipe.objects.bulk_create(new_recipe_ingredients)
+        self.create_ingredients_recipe(
+            ingredients,
+            new_recipe_ingredients,
+            instance=recipe
+        )
         return recipe
 
 
