@@ -54,7 +54,7 @@ class ShopingCartView(APIView):
     permission_classes = (IsAuthenticated, )
 
     def get(self, request, recipe_id):
-        data = {'id': recipe_id}
+        data = {'id': recipe_id, 'user': request.user.id}
         serializer = ShoppingCartSerializer(
             data=data,
             context={'request': request},
@@ -89,7 +89,7 @@ class FavoriteView(APIView):
     permission_classes = (IsAuthenticated, )
 
     def get(self, request, recipe_id):
-        data = {'id': recipe_id}
+        data = {'id': recipe_id, 'user': request.user.id}
         serializer = FavoriteSerializer(
             data=data,
             context={'request': request},

@@ -2,6 +2,7 @@ from django.contrib.auth import get_user_model
 from django.db import transaction
 from drf_extra_fields.fields import Base64ImageField
 from rest_framework import serializers
+from rest_framework.validators import UniqueTogetherValidator
 
 from users.serializers import CustomUserSerializer
 from .models import (Favorite, Ingredient, IngredientRecipe, Recipe,
@@ -24,8 +25,8 @@ class IngredientSerializer(serializers.ModelSerializer):
 
 class IngredientRecipeSerializer(serializers.ModelSerializer):
     id = serializers.PrimaryKeyRelatedField(
-        source="ingredient.id",
-        queryset=Ingredient.objects.values_list('id', flat=True)
+        source="ingredient",
+        queryset=Ingredient.objects.all()
     )
 
     class Meta:
@@ -53,7 +54,7 @@ class CreateRecipeSerializer(serializers.ModelSerializer):
             new_recipe_ingredients.append(
                 IngredientRecipe(
                     recipe=instance,
-                    ingredient_id=ingredient['ingredient']['id'],
+                    ingredient=ingredient['ingredient'],
                     amount=ingredient['amount'],
                 )
             )
@@ -101,16 +102,18 @@ class CreateRecipeSerializer(serializers.ModelSerializer):
 
 class IngredientGetRecipeSerializer(serializers.ModelSerializer):
     id = serializers.PrimaryKeyRelatedField(
-        source="ingredient.id",
-        queryset=Ingredient.objects.values_list('id', flat=True)
+        source="ingredient",
+        read_only=True
     )
-    name = serializers.CharField(
+    name = serializers.SlugRelatedField(
         read_only=True,
-        source="ingredient.name"
+        slug_field='name',
+        source='ingredient',
     )
-    measurement_unit = serializers.CharField(
+    measurement_unit = serializers.SlugRelatedField(
         read_only=True,
-        source="ingredient.measurement_unit"
+        slug_field='measurement_unit',
+        source="ingredient",
     )
 
     class Meta:
@@ -154,16 +157,18 @@ class GetRecipeSerializer(serializers.ModelSerializer):
 
 class ShoppingCartSerializer(serializers.ModelSerializer):
     id = serializers.PrimaryKeyRelatedField(
-        source="recipe.id",
-        queryset=Recipe.objects.values_list('id', flat=True)
+        source="recipe",
+        queryset=Recipe.objects.all()
     )
-    name = serializers.CharField(
-        read_only=True,
-        source="recipe.name"
+    name = serializers.SlugRelatedField(
+        queryset=Recipe.objects.all(),
+        slug_field='name',
+        source="recipe"
     )
-    cooking_time = serializers.CharField(
-        read_only=True,
-        source="recipe.cooking_time"
+    cooking_time = serializers.SlugRelatedField(
+        queryset=Recipe.objects.all(),
+        slug_field='cooking_time',
+        source="recipe"
     )
     image = Base64ImageField(
         source="recipe.image",
@@ -174,37 +179,42 @@ class ShoppingCartSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = ShopingCart
-        fields = ('id', 'name', 'image', 'cooking_time')
+        fields = ('id', 'name', 'image', 'cooking_time', 'user', 'recipe', )
+        validators = [
+            UniqueTogetherValidator(
+                queryset=ShopingCart.objects.all(),
+                fields=('user', 'recipe'),
+                message=('рецепт уже добавлен в список покупок')
+            )
+        ]
 
-    def validate(self, data):
-        request = self.context.get('request')
-        user = request.user
-        recipe_id = data['recipe']['id']
-        if ShopingCart.objects.filter(user=user, recipe_id=recipe_id).exists():
-            raise serializers.ValidationError({
-                'errors': 'рецепт уже добавлен в список покупок'
-            })
-        return data
+    def to_representation(self, obj):
+        ret = super(ShoppingCartSerializer, self).to_representation(obj)
+        del ret['user']
+        del ret['recipe']
+        return ret
 
     def create(self, validated_data):
         request = self.context.get('request')
         user = request.user
-        recipe = validated_data['recipe']['id']
-        return ShopingCart.objects.create(user=user, recipe_id=recipe)
+        recipe = validated_data['recipe']
+        return ShopingCart.objects.create(user=user, recipe=recipe)
 
 
 class FavoriteSerializer(serializers.ModelSerializer):
     id = serializers.PrimaryKeyRelatedField(
-        source="recipe.id",
-        queryset=Recipe.objects.values_list('id', flat=True)
+        source="recipe",
+        queryset=Recipe.objects.all()
     )
-    name = serializers.CharField(
-        read_only=True,
-        source="recipe.name"
+    name = serializers.SlugRelatedField(
+        queryset=Recipe.objects.all(),
+        slug_field='name',
+        source="recipe"
     )
-    cooking_time = serializers.CharField(
-        read_only=True,
-        source="recipe.cooking_time"
+    cooking_time = serializers.SlugRelatedField(
+        queryset=Recipe.objects.all(),
+        slug_field='cooking_time',
+        source="recipe"
     )
     image = Base64ImageField(
         source="recipe.image",
@@ -215,20 +225,23 @@ class FavoriteSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Favorite
-        fields = ('id', 'name', 'image', 'cooking_time')
+        fields = ('id', 'name', 'image', 'cooking_time', 'user', 'recipe', )
+        validators = [
+            UniqueTogetherValidator(
+                queryset=Favorite.objects.all(),
+                fields=('user', 'recipe'),
+                message=('рецепт уже добавлен в избранное')
+            )
+        ]
 
-    def validate(self, data):
-        request = self.context.get('request')
-        user = request.user
-        recipe_id = data['recipe']['id']
-        if Favorite.objects.filter(user=user, recipe_id=recipe_id).exists():
-            raise serializers.ValidationError({
-                'errors': 'рецепт уже добавлен в избранное'
-            })
-        return data
+    def to_representation(self, obj):
+        ret = super(FavoriteSerializer, self).to_representation(obj)
+        del ret['user']
+        del ret['recipe']
+        return ret
 
     def create(self, validated_data):
         request = self.context.get('request')
         user = request.user
-        recipe = validated_data['recipe']['id']
-        return Favorite.objects.create(user=user, recipe_id=recipe)
+        recipe = validated_data['recipe']
+        return Favorite.objects.create(user=user, recipe=recipe)
