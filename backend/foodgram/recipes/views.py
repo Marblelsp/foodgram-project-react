@@ -40,6 +40,8 @@ class IngredientViewSet(mixins.ListModelMixin,
     pagination_class = None
     queryset = Ingredient.objects.all()
     serializer_class = IngredientSerializer
+    filter_backends = (DjangoFilterBackend, )
+    filterset_fields = ('name', )
 
 
 class TagViewSet(mixins.ListModelMixin,
