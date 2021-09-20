@@ -10,7 +10,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from .filter import RecipesFilter, IngredientFilter
+from .filter import RecipesFilter, IngredientSearchFilter
 from .models import (Favorite, Ingredient, IngredientRecipe, Recipe,
                      ShopingCart, Tag)
 from .permissions import IsAuthorOrReadOnly
@@ -40,8 +40,8 @@ class IngredientViewSet(mixins.ListModelMixin,
     pagination_class = None
     queryset = Ingredient.objects.all()
     serializer_class = IngredientSerializer
-    filter_backends = (DjangoFilterBackend, )
-    filter_class = IngredientFilter
+    filter_backends = [IngredientSearchFilter]
+    search_fields = ['^name']
 
 
 class TagViewSet(mixins.ListModelMixin,
