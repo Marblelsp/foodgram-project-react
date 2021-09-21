@@ -119,6 +119,7 @@ class CreateRecipeSerializer(serializers.ModelSerializer):
 
         return data
 
+
 class IngredientGetRecipeSerializer(serializers.ModelSerializer):
     id = serializers.PrimaryKeyRelatedField(
         source="ingredient",
