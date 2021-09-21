@@ -99,6 +99,25 @@ class CreateRecipeSerializer(serializers.ModelSerializer):
         )
         return recipe
 
+    def validate(self, data):
+        ingredients = self.initial_data.get('ingredients')
+        for ingredient_item in ingredients:
+            if int(ingredient_item['amount']) <= 0:
+                raise serializers.ValidationError({
+                    'ingredients': ('Убедитесь, что значение количества '
+                                    'ингредиента больше 0.')
+                })
+        return data
+
+    def validate_cooking_time(self, data):
+        cooking_time = self.initial_data.get('cooking_time')
+        if int(cooking_time) <= 0:
+            raise serializers.ValidationError(
+                'Убедитесь, что время '
+                'приготовления больше 0.'
+            )
+
+        return data
 
 class IngredientGetRecipeSerializer(serializers.ModelSerializer):
     id = serializers.PrimaryKeyRelatedField(
